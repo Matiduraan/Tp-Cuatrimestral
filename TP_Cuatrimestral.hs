@@ -101,21 +101,37 @@ tango unAuto = unAuto
 cambiarTemperaturaANoventa :: TallerMecanico
 cambiarTemperaturaANoventa unAuto = unAuto {temperaturaAgua = 90}
 
--- lima :: TallerMecanico
--- lima unAuto = unAuto {desgasteDeLlantas = cambiarDesgasteDePrimerasLlantas desgasteDeLlantas unAuto}
+lima :: TallerMecanico
+lima unAuto = unAuto {desgasteDeLlantas = cambiarDesgasteDePrimerasLlantas (desgasteDeLlantas unAuto)}
 -- tenemos que hacerlo de una forma que lima sea tipo TallerMecanico y no Desgaste -> Desgaste
 
 cambiarDesgasteDePrimerasLlantas :: [Desgaste] -> [Desgaste]
-cambiarDesgasteDePrimerasLlantas lasLlantas = [0,0] ++ drop 2 lasLlantas
+cambiarDesgasteDePrimerasLlantas lasLlantas = [0.0,0.0] ++ drop 2 lasLlantas
 
 -- 4) Ordenamiento TOC de autos
 
-{-
-● los autos ubicados en la posición impar de la lista deben tener una cantidad de desgaste
-impar
-● los autos ubicados en la posición par deben tener una cantidad de desgaste par
-● el primer elemento está en la posición 1, el segundo elemento en la
-posición 2, etc.
--}
+ordenamientoTOC :: [Auto] -> Bool
+ordenamientoTOC listaDeAutos = all odd (map desgasteDelAuto (elementosImpares listaDeAutos)) && all even (map desgasteDelAuto (elementosPares listaDeAutos))
+
+elementosImpares :: [a] -> [a]
+elementosImpares [elemento] = filter odd [elemento]
+elementosImpares [primero,segundo] = filter odd [primero,segundo]
+elementosImpares (primero:segundo:cola) = (primero:numerosImpares(cola))
+
+elementosPares :: [a] -> [a]
+elementosPares [elemento] = filter even [elemento]
+elementosPares [primero,segundo] = filter even [primero,segundo]
+elementosPares (primero:segundo:cola) = (segundo:numerosImpares(cola))
+
+
+
+desgasteDelAuto :: Auto -> Int
+desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
+
+
+-- Pto 5
+
+ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico
+ordenDeReparacion fecha unosTecnicos unAuto = unAuto{ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
 
 
