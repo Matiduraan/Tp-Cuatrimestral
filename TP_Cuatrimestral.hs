@@ -145,10 +145,9 @@ desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
 
 -- Pto 5
 -- aca no seria Fecha -> TallerMecanico -> Auto ?
-{-
+
 ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico 
 ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
--}
 
 -- 6)
 -- Integrante a 
