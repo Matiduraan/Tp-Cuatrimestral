@@ -2,6 +2,7 @@ type Patente = String
 type Desgaste = Float
 type Fecha = (Int, Int, Int)
 type TallerMecanico = Auto -> Auto
+type Tecnicos = TallerMecanico
 
 
 
@@ -65,10 +66,24 @@ desgasteDeLaPrimerLlanta lasLlantas = head lasLlantas
 esUnAutoPeligroso :: [Desgaste] -> Bool
 esUnAutoPeligroso lasLlantas = desgasteDeLaPrimerLlanta lasLlantas > 0.5
 
+-- opcion 2 para usar en pto 6 
+esUnAutoPeligroso' :: Auto -> Bool
+esUnAutoPeligroso' unAuto = desgasteDeLaPrimerLlanta' unAuto > 0.5
+
+desgasteDeLaPrimerLlanta' :: Auto -> Auto
+desgasteDeLaPrimerLlanta' unAuto = unAuto {desgasteDeLlantas = head desgasteDeLlantas unAuto}
+
 -- Integrante b
 
 necesitaRevision :: Fecha -> Bool
 necesitaRevision unaFecha  = anio unaFecha  <= 2015
+
+-- opcion 2 que recibe un auto y tiene mas logica / para usar en pto 6
+necesitaRevision' :: Auto -> Bool
+necesitaRevision' unAuto = anioDelUltimoArreglo unAuto <= 2015
+
+anioDelUltimoArreglo :: Auto -> Fecha
+anioDelUltimoArreglo unAuto = unAuto {ultimoArreglo = anio ultimoArreglo unAuto} -- POR QUE ESTA MAAAAAL LPM
 
 -- 3) Taller Mecanico
 -- Integrante a
@@ -95,15 +110,14 @@ charly = alfa.bravo
 tango :: TallerMecanico
 tango unAuto = unAuto
 
--- zulu :: TallerMecanico
--- zulu = lima.cambiarTemperaturaANoventa 
+zulu :: TallerMecanico
+zulu = lima.cambiarTemperaturaANoventa 
 
 cambiarTemperaturaANoventa :: TallerMecanico
 cambiarTemperaturaANoventa unAuto = unAuto {temperaturaAgua = 90}
 
 lima :: TallerMecanico
 lima unAuto = unAuto {desgasteDeLlantas = cambiarDesgasteDePrimerasLlantas (desgasteDeLlantas unAuto)}
--- tenemos que hacerlo de una forma que lima sea tipo TallerMecanico y no Desgaste -> Desgaste
 
 cambiarDesgasteDePrimerasLlantas :: [Desgaste] -> [Desgaste]
 cambiarDesgasteDePrimerasLlantas lasLlantas = [0.0,0.0] ++ drop 2 lasLlantas
@@ -130,8 +144,29 @@ desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
 
 
 -- Pto 5
+-- aca no seria Fecha -> TallerMecanico -> Auto ?
+{-
+ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico 
+ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
+-}
 
-ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico
-ordenDeReparacion fecha unosTecnicos unAuto = unAuto{ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
+-- 6)
+-- Integrante a 
+
+tecnicosQueDejanElAutoEnCondiciones :: [Tecnicos] -> [Tecnicos]
+tecnicosQueDejanElAutoEnCondiciones unosTecnicos = filter autoEnCondiciones unosTecnicos
+
+autoEnCondiciones :: Auto -> Bool
+autoEnCondiciones = not esUnAutoPeligroso' 
+
+-- Integrante b
+
+costoDeReparacionDeAutosQueNecesitanRevision :: [Patente] -> [Auto] -> Int
+costoDeReparacionDeAutosQueNecesitanRevision unasPatentes unosAutos = costoDeReparacion unasPatentes.autosQueNecesitanRevision unosAutos  
+
+autosQueNecesitanRevision :: [Auto] -> [Auto]
+autosQueNecesitanRevision unosAutos = filter necesitaRevision' unosAutos
+
+
 
 
