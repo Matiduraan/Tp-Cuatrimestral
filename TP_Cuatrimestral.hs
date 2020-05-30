@@ -89,6 +89,14 @@ desgasteDeLaPrimerLlanta' lasLlantas = head lasLlantas
 esUnAutoPeligroso' :: [Desgaste] -> Bool
 esUnAutoPeligroso' lasLlantas = desgasteDeLaPrimerLlanta' lasLlantas > 0.5
 
+--Mi propuesta
+--esUnAutoPeligroso :: Auto -> Bool
+--esUnAutoPeligroso unAuto = (desgasteDeLaPrimerLlanta (desgasteDeLlantas unAuto)) > 0.5
+
+-- tu propuesta con composicion (no se si esta bien)
+esUnAutoPeligroso'' :: Auto -> Bool
+esUnAutoPeligroso'' unAuto = (> 0.5).desgasteDeLaPrimerLlanta.desgasteDeLlantas unAuto
+
 -- opcion 2 para usar en pto 6 
 esUnAutoPeligroso :: Auto -> Bool
 esUnAutoPeligroso unAuto = desgasteDeLaPrimerLlanta unAuto > 0.5
@@ -213,4 +221,6 @@ primerTecnicoEnCondiciones unosTecnicos unAuto = head (tecnicosQueDejanElAutoEnC
 -- No se puede hacer con una lista infinita
 -- por que no?
 
+--Integrante b)
 
+-- No se puede hacer con una lista infinita
