@@ -2,7 +2,7 @@ type Patente = String
 type Desgaste = Float
 type Fecha = (Int, Int, Int)
 type TallerMecanico = Auto -> Auto
-type Tecnicos = TallerMecanico
+type Tecnico = TallerMecanico
 
 
 
@@ -25,21 +25,30 @@ data Auto = UnAuto { patente :: Patente,
 anio :: Fecha -> Int
 anio (_,_,year) = year
 
+-- 1)
+-- Hay que usar composicion
 
 costoDeReparacion :: Patente -> Auto -> Int
 costoDeReparacion unaPatente unAuto 
- | patenteTieneSieteDigitos unaPatente unAuto = 12500
- | patenteEstaEntreDJyNB unaPatente unAuto && patenteTerminaEn4 unaPatente unAuto = 3 * (length unaPatente)
- | patenteEstaEntreDJyNB unaPatente unAuto = 20000
+ | patenteTieneSieteDigitos unaPatente = 12500 
+ | patenteEstaEntreDJyNB unaPatente && patenteTerminaEn4 unaPatente  = 3 * (length unaPatente)
+ | patenteEstaEntreDJyNB unaPatente  = 20000
+ -- logicamente habria que pasarles un auto, porque es la patente de ESE auto pero hay q ver como hacer las funciones para que RECIBAn un auto y no tiren ERROOOOORRRRR
  | otherwise = 15000
 
 patenteTieneSieteDigitos :: Patente -> Bool
 patenteTieneSieteDigitos unaPatente = length unaPatente == 7
 
+
+{-
+patenteTieneSieteDigitos :: Patente -> Bool
+patenteTieneSieteDigitos unaPatente = (== 7).length unaPatente 
+-}
+
 patenteEstaEntreDJyNB :: Patente -> Bool
 patenteEstaEntreDJyNB unaPatente = estaEntreDyN (head unaPatente) && estaEntreJyB (tail (take 2 unaPatente))
 
--- tambien cambiaria lo que recibe estaEntreJyB y haria una funcion para devolver la cola de la lista para que no quede tan algoritmica (?
+-- lo de tail no lo entendi, se supone que son las patentes viejas
 
 estaEntreDyN :: String -> Bool
 estaEntreDyN unaLetra = elem unaLetra entreDyN
@@ -47,11 +56,26 @@ estaEntreDyN unaLetra = elem unaLetra entreDyN
 estaEntreJyB :: String -> Bool
 estaEntreJyB unaLetra = elem unaLetra entreJyB
 
-entreDyN :: [char]
+entreDyN :: [Char]
 entreDyN = ['D'..'N']
 
-entreJyB :: [char]
+entreJyB :: [Char]
 entreJyB = ['J'..'B']
+
+-- yo lo haria asi
+
+{- 
+estaEntreDyN' :: Char -> Bool
+estaEntreDyN' unaLetra = elem unaLetra ['D'..'N']
+
+estaEntreJyB' :: Char -> Bool
+estaEntreJyB' unaLetra = elem unaLetra ['J'..'B']
+-}
+
+-- creo que hay algo que no termino de entender, la patente deberia estar entre DJ y NB, por que haces entre DN y JB
+-- ponele DGO-234 esta en el rango porque el head esta entre D-J
+-- pero en ese caso por que dicen "deberia estar entre xx Y entre xx"
+-- no tiene SENTIDOOOOOOOOOOOOOOOOOOOOOO
 
 patenteTerminaEn4 :: Patente -> Bool
 patenteTerminaEn4 unaPatente =  drop ((length unaPatente) - 1) unaPatente == 4
@@ -60,18 +84,18 @@ patenteTerminaEn4 unaPatente =  drop ((length unaPatente) - 1) unaPatente == 4
 -- Estas funciones deberian recibir un AUTO 
 -- Integrante a
 
-desgasteDeLaPrimerLlanta :: [Desgaste] -> Float
-desgasteDeLaPrimerLlanta lasLlantas = head lasLlantas 
+desgasteDeLaPrimerLlanta' :: [Desgaste] -> Float
+desgasteDeLaPrimerLlanta' lasLlantas = head lasLlantas 
 
-esUnAutoPeligroso :: [Desgaste] -> Bool
-esUnAutoPeligroso lasLlantas = desgasteDeLaPrimerLlanta lasLlantas > 0.5
+esUnAutoPeligroso' :: [Desgaste] -> Bool
+esUnAutoPeligroso' lasLlantas = desgasteDeLaPrimerLlanta' lasLlantas > 0.5
 
 -- opcion 2 para usar en pto 6 
-esUnAutoPeligroso' :: Auto -> Bool
-esUnAutoPeligroso' unAuto = desgasteDeLaPrimerLlanta' unAuto > 0.5
+esUnAutoPeligroso :: Auto -> Bool
+esUnAutoPeligroso unAuto = desgasteDeLaPrimerLlanta unAuto > 0.5
 
-desgasteDeLaPrimerLlanta' :: Auto -> Auto
-desgasteDeLaPrimerLlanta' unAuto = unAuto {desgasteDeLlantas = head desgasteDeLlantas unAuto}
+desgasteDeLaPrimerLlanta :: Auto -> Auto
+desgasteDeLaPrimerLlanta unAuto = unAuto {desgasteDeLlantas = head (desgasteDeLlantas unAuto)}
 
 -- Integrante b
 
@@ -82,8 +106,9 @@ necesitaRevision unaFecha  = anio unaFecha  <= 2015
 necesitaRevision' :: Auto -> Bool
 necesitaRevision' unAuto = anioDelUltimoArreglo unAuto <= 2015
 
-anioDelUltimoArreglo :: Auto -> Fecha
-anioDelUltimoArreglo unAuto = unAuto {ultimoArreglo = anio ultimoArreglo unAuto} -- POR QUE ESTA MAAAAAL LPM
+anioDelUltimoArreglo :: Auto -> Auto
+anioDelUltimoArreglo unAuto = unAuto {ultimoArreglo = anio (ultimoArreglo unAuto)} 
+
 
 -- 3) Taller Mecanico
 -- Integrante a
@@ -93,24 +118,24 @@ alfa unAuto
  | cumpleCondicionParaRegularLasVueltas unAuto = regularLasVueltas 2000 unAuto
  | otherwise = unAuto
 
-regularLasVueltas :: Int -> TallerMecanico
-regularLasVueltas revoluciones unAuto = unAuto {rpm = revoluciones} 
-
 cumpleCondicionParaRegularLasVueltas :: Auto -> Bool
 cumpleCondicionParaRegularLasVueltas unAuto = rpm unAuto > 2000
 
-bravo :: TallerMecanico
-bravo unAuto = unAuto {desgasteDeLlantas = 0}
+regularLasVueltas :: Int -> TallerMecanico
+regularLasVueltas revoluciones unAuto = unAuto {rpm = revoluciones} 
 
-charly :: TallerMecanico
-charly = alfa.bravo 
+bravo :: Tecnico
+bravo unAuto = unAuto {desgasteDeLlantas = [0]}  -- o seria = 0 nada mas?
+
+charly :: Tecnico
+charly = alfa bravo 
 
 -- Integrante b
 
-tango :: TallerMecanico
-tango unAuto = unAuto
+tango :: Tecnico
+tango = id
 
-zulu :: TallerMecanico
+zulu :: Tecnico
 zulu = lima.cambiarTemperaturaANoventa 
 
 cambiarTemperaturaANoventa :: TallerMecanico
@@ -137,27 +162,38 @@ elementosPares [elemento] = filter even [elemento]
 elementosPares [primero,segundo] = filter even [primero,segundo]
 elementosPares (primero:segundo:cola) = (segundo:numerosImpares(cola))
 
-
-
 desgasteDelAuto :: Auto -> Int
 desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
 
 
 -- Pto 5
--- aca no seria Fecha -> TallerMecanico -> Auto ?
-{-
-ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico 
+
+ordenDeReparacion :: Fecha -> [Tecnico] -> TallerMecanico 
 ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
--}
+
+-- yo lo haria asi 
+
+ordenDeReparacion' :: Fecha -> [Tecnico] -> TallerMecanico
+ordenDeReparacion' unaFecha unosTecnicos unAuto = (actualizarUltimaFechaDeReparacion unaFecha.realizarLasReparaciones unosTecnicos) unAuto
+
+actualizarUltimaFechaDeReparacion :: Fecha -> Auto -> Auto
+actualizarUltimaFechaDeReparacion fechaDelUltimoArreglo unAuto = unAuto {ultimoArreglo = fechaDelUltimoArreglo}
+
+-- tiene que recibir un auto SOLO, algo esta mal definido en la funcion
+realizarLasReparaciones :: [Tecnico] -> TallerMecanico
+realizarLasReparaciones unosTecnicos unAuto = map ($unAuto) unosTecnicos
+
 
 -- 6)
 -- Integrante a 
 
-tecnicosQueDejanElAutoEnCondiciones :: [Tecnicos] -> [Tecnicos]
+tecnicosQueDejanElAutoEnCondiciones :: [Tecnico] -> [Tecnico]
 tecnicosQueDejanElAutoEnCondiciones unosTecnicos = filter autoEnCondiciones unosTecnicos
 
+--tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto = filter autoEnCondiciones (map ($unAuto) unosTecnicos)
+
 autoEnCondiciones :: Auto -> Bool
-autoEnCondiciones = not esUnAutoPeligroso' 
+autoEnCondiciones = not esUnAutoPeligroso 
 
 -- Integrante b
 
@@ -167,6 +203,14 @@ costoDeReparacionDeAutosQueNecesitanRevision unasPatentes unosAutos = costoDeRep
 autosQueNecesitanRevision :: [Auto] -> [Auto]
 autosQueNecesitanRevision unosAutos = filter necesitaRevision' unosAutos
 
+--7)
 
+--Integrante a
+
+primerTecnicoEnCondiciones unosTecnicos unAuto = head (tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto)
+
+--Integrante b
+
+-- No se puede hacer con una lista infinita
 
 
