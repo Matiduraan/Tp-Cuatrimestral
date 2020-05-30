@@ -25,6 +25,14 @@ data Auto = UnAuto { patente :: Patente,
 anio :: Fecha -> Int
 anio (_,_,year) = year
 
+-- Auxiliares
+
+mapDesgaste :: ([Desgaste] -> [Desgaste]) -> Auto -> Auto
+mapDesgaste unaFuncion unAuto = unAuto {desgasteDeLlantas = unaFuncion.desgasteDeLlantas $ unAuto}
+
+-- Auxiliares
+
+
 -- 1)
 -- Hay que usar composicion
 
@@ -103,6 +111,9 @@ esUnAutoPeligroso unAuto = desgasteDeLaPrimerLlanta unAuto > 0.5
 
 desgasteDeLaPrimerLlanta :: Auto -> Auto
 desgasteDeLaPrimerLlanta unAuto = unAuto {desgasteDeLlantas = head (desgasteDeLlantas unAuto)}
+
+desgasteDeLaPrimerLlanta'' :: Auto -> Auto
+desgasteDeLaPrimerLlanta'' = mapDesgaste (head) 
 
 -- Integrante b
 
