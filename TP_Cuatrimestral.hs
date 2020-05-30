@@ -66,6 +66,10 @@ desgasteDeLaPrimerLlanta lasLlantas = head lasLlantas
 esUnAutoPeligroso :: [Desgaste] -> Bool
 esUnAutoPeligroso lasLlantas = desgasteDeLaPrimerLlanta lasLlantas > 0.5
 
+--Mi propuesta
+--esUnAutoPeligroso :: Auto -> Bool
+--esUnAutoPeligroso unAuto = (desgasteDeLaPrimerLlanta (desgasteDeLlantas unAuto)) > 0.5
+
 -- opcion 2 para usar en pto 6 
 esUnAutoPeligroso' :: Auto -> Bool
 esUnAutoPeligroso' unAuto = desgasteDeLaPrimerLlanta' unAuto > 0.5
@@ -145,15 +149,20 @@ desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
 
 -- Pto 5
 -- aca no seria Fecha -> TallerMecanico -> Auto ?
+-- Ahi lo cambie 
 
-ordenDeReparacion :: Fecha -> TallerMecanico -> TallerMecanico 
+ordenDeReparacion :: Fecha -> [Tecnicos] -> TallerMecanico 
 ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
 
 -- 6)
 -- Integrante a 
 
+-- A esto no le falta el parametro unAuto?
+
 tecnicosQueDejanElAutoEnCondiciones :: [Tecnicos] -> [Tecnicos]
 tecnicosQueDejanElAutoEnCondiciones unosTecnicos = filter autoEnCondiciones unosTecnicos
+
+-- tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto = filter autoEnCondiciones (map ($unAuto) unosTecnicos)
 
 autoEnCondiciones :: Auto -> Bool
 autoEnCondiciones = not esUnAutoPeligroso' 
@@ -166,6 +175,12 @@ costoDeReparacionDeAutosQueNecesitanRevision unasPatentes unosAutos = costoDeRep
 autosQueNecesitanRevision :: [Auto] -> [Auto]
 autosQueNecesitanRevision unosAutos = filter necesitaRevision' unosAutos
 
+--7)
 
+--Integrante a)
 
+PrimerTecnicoEnCondiciones unosTecnicos unAuto = head (tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto)
 
+--Integrante b)
+
+-- No se puede hacer con una lista infinita
