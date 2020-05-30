@@ -64,13 +64,12 @@ entreJyB = ['J'..'B']
 
 -- yo lo haria asi
 
-{- 
 estaEntreDyN' :: Char -> Bool
 estaEntreDyN' unaLetra = elem unaLetra ['D'..'N']
 
 estaEntreJyB' :: Char -> Bool
 estaEntreJyB' unaLetra = elem unaLetra ['J'..'B']
--}
+
 
 -- creo que hay algo que no termino de entender, la patente deberia estar entre DJ y NB, por que haces entre DN y JB
 -- ponele DGO-234 esta en el rango porque el head esta entre D-J
@@ -212,5 +211,6 @@ primerTecnicoEnCondiciones unosTecnicos unAuto = head (tecnicosQueDejanElAutoEnC
 --Integrante b
 
 -- No se puede hacer con una lista infinita
+-- por que no?
 
 
