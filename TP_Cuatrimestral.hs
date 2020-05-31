@@ -30,6 +30,9 @@ anio (_,_,year) = year
 mapDesgaste :: ([Desgaste] -> [Desgaste]) -> Auto -> Auto
 mapDesgaste unaFuncion unAuto = unAuto {desgasteDeLlantas = unaFuncion.desgasteDeLlantas $ unAuto}
 
+mapUltimoArreglo :: (Fecha -> Fecha) -> Auto -> Auto
+mapUltimoArreglo unaFuncion unAuto = unAuto {ultimoArreglo = unaFuncion.ultimoArreglo $ unAuto}
+
 -- Auxiliares
 
 
@@ -88,45 +91,27 @@ patenteTerminaEn4 :: Patente -> Bool
 patenteTerminaEn4 unaPatente =  drop ((length unaPatente) - 1) unaPatente == 4
 
 -- 2)
--- Estas funciones deberian recibir un AUTO 
 -- Integrante a
-
-desgasteDeLaPrimerLlanta' :: [Desgaste] -> Float
-desgasteDeLaPrimerLlanta' lasLlantas = head lasLlantas 
-
-esUnAutoPeligroso' :: [Desgaste] -> Bool
-esUnAutoPeligroso' lasLlantas = desgasteDeLaPrimerLlanta' lasLlantas > 0.5
 
 --Mi propuesta
 --esUnAutoPeligroso :: Auto -> Bool
 --esUnAutoPeligroso unAuto = (desgasteDeLaPrimerLlanta (desgasteDeLlantas unAuto)) > 0.5
 
 -- tu propuesta con composicion (no se si esta bien)
-esUnAutoPeligroso'' :: Auto -> Bool
-esUnAutoPeligroso'' unAuto = (> 0.5).desgasteDeLaPrimerLlanta.desgasteDeLlantas unAuto
 
--- opcion 2 para usar en pto 6 
 esUnAutoPeligroso :: Auto -> Bool
 esUnAutoPeligroso unAuto = desgasteDeLaPrimerLlanta unAuto > 0.5
 
-desgasteDeLaPrimerLlanta :: Auto -> Auto
-desgasteDeLaPrimerLlanta unAuto = unAuto {desgasteDeLlantas = head (desgasteDeLlantas unAuto)}
-
-desgasteDeLaPrimerLlanta'' :: Auto -> Auto
-desgasteDeLaPrimerLlanta'' = mapDesgaste (head) 
+desgasteDeLaPrimerLlanta :: Auto -> Float
+desgasteDeLaPrimerLlanta = head.desgasteDeLlantas
 
 -- Integrante b
 
-necesitaRevision :: Fecha -> Bool
-necesitaRevision unaFecha  = anio unaFecha  <= 2015
+necesitaRevision :: Auto -> Bool
+necesitaRevision unAuto = anioDelUltimoArreglo unAuto <= 2015
 
--- opcion 2 que recibe un auto y tiene mas logica / para usar en pto 6
-necesitaRevision' :: Auto -> Bool
-necesitaRevision' unAuto = anioDelUltimoArreglo unAuto <= 2015
-
-anioDelUltimoArreglo :: Auto -> Auto
-anioDelUltimoArreglo unAuto = unAuto {ultimoArreglo = anio (ultimoArreglo unAuto)} 
-
+anioDelUltimoArreglo :: Auto -> Int
+anioDelUltimoArreglo  = anio.ultimoArreglo 
 
 -- 3) Taller Mecanico
 -- Integrante a
@@ -145,8 +130,8 @@ regularLasVueltas revoluciones unAuto = unAuto {rpm = revoluciones}
 bravo :: Tecnico
 bravo unAuto = unAuto {desgasteDeLlantas = [0]}  -- o seria = 0 nada mas?
 
-charly :: Tecnico
-charly = alfa bravo 
+charly :: Tecnico 
+charly = alfa.bravo 
 
 -- Integrante b
 
@@ -187,31 +172,36 @@ desgasteDelAuto unAuto = round (10 * (sum (desgasteDeLlantas unAuto)))
 -- Pto 5
 
 ordenDeReparacion :: Fecha -> [Tecnico] -> TallerMecanico 
-ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo unAuto = fecha } && map ($unAuto) unosTecnicos
+ordenDeReparacion fecha unosTecnicos unAuto = unAuto {ultimoArreglo = fecha } && map ($unAuto) unosTecnicos
 
 -- yo lo haria asi 
-
 ordenDeReparacion' :: Fecha -> [Tecnico] -> TallerMecanico
 ordenDeReparacion' unaFecha unosTecnicos unAuto = (actualizarUltimaFechaDeReparacion unaFecha.realizarLasReparaciones unosTecnicos) unAuto
 
 actualizarUltimaFechaDeReparacion :: Fecha -> Auto -> Auto
 actualizarUltimaFechaDeReparacion fechaDelUltimoArreglo unAuto = unAuto {ultimoArreglo = fechaDelUltimoArreglo}
 
--- tiene que recibir un auto SOLO, algo esta mal definido en la funcion
+-- no se si estara bien pero lo pense como "Realizar reparaciones" = "usa las funciones q cambian el auto" = "componer funciones"
 realizarLasReparaciones :: [Tecnico] -> TallerMecanico
-realizarLasReparaciones unosTecnicos unAuto = map ($unAuto) unosTecnicos
+realizarLasReparaciones unosTecnicos unAuto = foldl1 (.) unosTecnicos $ unAuto
 
 
 -- 6)
 -- Integrante a 
 
-tecnicosQueDejanElAutoEnCondiciones :: [Tecnico] -> [Tecnico]
-tecnicosQueDejanElAutoEnCondiciones unosTecnicos = filter autoEnCondiciones unosTecnicos
+tecnicosQueDejanElAutoEnCondiciones ::  Auto -> [Tecnico] -> [Tecnico]
+tecnicosQueDejanElAutoEnCondiciones unAuto unosTecnicos = filter dejaElAutoEnCondiciones' 
+
+dejaElAutoEnCondiciones :: Auto -> Tecnico -> Bool
+dejaElAutoEnCondiciones unAuto unTecnico = autoEnCondiciones.unTecnico $ unAuto
+
+dejaElAutoEnCondiciones' :: [Tecnico] -> Auto -> Bool
+dejaElAutoEnCondiciones' unosTecnicos unAuto = autoEnCondiciones.realizarLasReparaciones unosTecnicos $ unAuto
 
 --tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto = filter autoEnCondiciones (map ($unAuto) unosTecnicos)
 
 autoEnCondiciones :: Auto -> Bool
-autoEnCondiciones = not esUnAutoPeligroso 
+autoEnCondiciones = not.esUnAutoPeligroso 
 
 -- Integrante b
 
@@ -219,7 +209,7 @@ costoDeReparacionDeAutosQueNecesitanRevision :: [Patente] -> [Auto] -> Int
 costoDeReparacionDeAutosQueNecesitanRevision unasPatentes unosAutos = costoDeReparacion unasPatentes.autosQueNecesitanRevision unosAutos  
 
 autosQueNecesitanRevision :: [Auto] -> [Auto]
-autosQueNecesitanRevision unosAutos = filter necesitaRevision' unosAutos
+autosQueNecesitanRevision unosAutos = filter necesitaRevision unosAutos
 
 --7)
 
