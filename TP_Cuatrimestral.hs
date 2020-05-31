@@ -16,32 +16,32 @@ data Auto = UnAuto { patente :: Patente,
 
 
 -- Ejemplos de autos
-autoMartu1 :: Auto
-autoMartu1 = UnAuto "AT001LN" [0.1,0.4, 0.2, 0.0] 100 120 (10,04,2020)
+chevrolet :: Auto
+chevrolet = UnAuto "AT001LN" [0.5, 0.1, 0.6, 0.4] 2000 120 (10,12,2014)
 
-autoMartu2 :: Auto
-autoMartu2 = UnAuto "DJV214" [0.8,0.2,0.4,0.5] 2001 200 (23,05,2018)
+ferrari :: Auto
+ferrari = UnAuto "DJV214" [0.51, 0.1, 0.6, 0.4] 2001 200 (23,5,2018)
 
-autoMartu3 :: Auto
-autoMartu3 = UnAuto "DJV215" [0.5, 0.1, 0.6, 0.4] 1000 90 (12,07,2016)
+bugatti :: Auto
+bugatti = UnAuto "DJV215" [0.2, 0.5, 0.6, 0.1] 1000 300 (12,7,2016)
 
-autoMati1 :: Auto
-autoMati1 = UnAuto "AAA111" [0.51, 0.1, 0.6, 0.4] 12 50 (1,2,2015)
+shelby :: Auto
+shelby = UnAuto "DFH029" [0.1,0.4, 0.2, 0.0] 2100 30 (8,10,2015)
 
-autoMati2 :: Auto
-autoMati2 = UnAuto "DFH029" [0.5, 0.1, 0.6, 0.4] 50 0 (1,12,2015)
+nissan :: Auto
+nissan = UnAuto "NBA154" [0.1,0.4, 0.2, 0.0] 3000 70 (5,5,2015)
 
-autoMati3 :: Auto
-autoMati3 = UnAuto "NBA158" [0.1, 0.1, 0.1, 0] 0 12 (5,10,2016)
+audi :: Auto
+audi = UnAuto "JN123EF" [0.3, 0.5, 0.6, 0.1] 2500 90 (31,12,2015)
 
-autoMati5 :: Auto
-autoMati5 = UnAuto "NBA158" [0.2, 0.5, 0.6, 0.1] 0 12 (5,10,2016)
+kia :: Auto
+kia = UnAuto "AA111BB" [0.1, 0.1, 0.1, 0.0] 1500 100 (18,9,2020)
 
-autoMati4 :: Auto
-autoMati4 = UnAuto "NBA158" [0.1, 0.4, 0.2, 0] 0 12 (5,10,2016)
+toyota :: Auto
+toyota = UnAuto "DJ020MP" [0.6,0.2,0.4,0.8] 2001 30 (1,1,2016)
 
 listaDeAutosDePrueba :: [Auto]
-listaDeAutosDePrueba = [autoMartu1, autoMartu2, autoMartu3, autoMati1, autoMati2, autoMati3, autoMati4]
+listaDeAutosDePrueba = [chevrolet,ferrari,bugatti,shelby,nissan,audi,kia,toyota]
 
 -- Auxiliares
 
