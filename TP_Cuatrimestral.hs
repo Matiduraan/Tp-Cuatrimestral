@@ -41,6 +41,9 @@ kia = UnAuto "AA111BB" [0.1, 0.1, 0.1, 0.0] 1500 100 (18,9,2020)
 toyota :: Auto
 toyota = UnAuto "DJ020MP" [0.6, 0.2, 0.4, 0.8] 2001 30 (1,1,2010)
 
+panther6 :: Auto
+panther6 = UnAuto "SE156IS" [0.8,0.2,0.5,0.7,0.1,0.9] 3000 170 (16,1,1977)
+
 -- Auxiliares
 
 anio :: Fecha -> Int
@@ -48,6 +51,9 @@ anio (_,_,year) = year
 
 segundoDeLaLista :: String -> Char
 segundoDeLaLista lista = lista !! 1
+
+cambiarDesgasteDeLlantas :: ([Desgaste] -> [Desgaste]) -> Auto -> Auto
+cambiarDesgasteDeLlantas unaFuncion unAuto = unAuto {desgasteDeLlantas = unaFuncion.desgasteDeLlantas $ unAuto}
 
 -- 1)
 
@@ -76,11 +82,14 @@ estaEntreDyN = entreDyN.head
 estaEntreJyB :: Patente -> Bool
 estaEntreJyB = entreJyB.segundoDeLaLista
 
+-- cambiar
+
 entreDyN :: Char -> Bool
 entreDyN unaLetra = elem unaLetra ['D'..'N']
 
 entreJyB :: Char -> Bool
 entreJyB unaLetra = elem unaLetra (['A','B'] ++ ['J'..'Z']) 
+
 
 -- 2)
 
@@ -116,7 +125,13 @@ regularLasVueltas :: Int -> TallerMecanico
 regularLasVueltas revoluciones unAuto = unAuto {rpm = revoluciones} 
 
 bravo :: Tecnico
-bravo unAuto = unAuto {desgasteDeLlantas = [0.0,0.0,0.0,0.0]} 
+bravo = cambiarDesgasteDeLlantas (dejarCubiertasSinDesgaste) 
+
+dejarCubiertasSinDesgaste :: [Desgaste] -> [Desgaste]
+dejarCubiertasSinDesgaste desgasteDeLasLlantas = map desgasteEnCero desgasteDeLasLlantas
+
+desgasteEnCero :: Desgaste -> Desgaste
+desgasteEnCero _ = 0
 
 charly :: Tecnico 
 charly = alfa.bravo 
@@ -144,11 +159,12 @@ tienenOrdenamientoTOC :: [Auto] -> Bool
 tienenOrdenamientoTOC listaDeAutos = autosUbicadosEnPosicionImparTienenDesgasteImpar listaDeAutos && autosUbicadosEnPosicionParTienenDesgastePar listaDeAutos
 
 autosUbicadosEnPosicionImparTienenDesgasteImpar :: [Auto] -> Bool
-autosUbicadosEnPosicionImparTienenDesgasteImpar listaDeAutos = all odd.map desgasteDelAuto $ elementosImpares listaDeAutos
+autosUbicadosEnPosicionImparTienenDesgasteImpar = all odd.map desgasteDelAuto.elementosImpares 
 
 autosUbicadosEnPosicionParTienenDesgastePar :: [Auto] -> Bool
-autosUbicadosEnPosicionParTienenDesgastePar listaDeAutos = all even.map desgasteDelAuto $ elementosPares listaDeAutos
+autosUbicadosEnPosicionParTienenDesgastePar = all even.map desgasteDelAuto.elementosPares 
 
+--cambiar
 elementosImpares :: [a] -> [a]
 elementosImpares [] = []
 elementosImpares [elemento] = [elemento]
@@ -162,18 +178,18 @@ elementosPares [_,segundo] = [segundo]
 elementosPares (_:segundo:cola) = (segundo:elementosPares(cola))
 
 desgasteDelAuto :: Auto -> Int
-desgasteDelAuto unAuto = round.(10 *).sum.desgasteDeLlantas $ unAuto
+desgasteDelAuto = round.(10 *).sum.desgasteDeLlantas
 
 -- 5)
 
 ordenDeReparacion :: Fecha -> [Tecnico] -> TallerMecanico
-ordenDeReparacion unaFecha unosTecnicos unAuto = actualizarUltimaFechaDeReparacion unaFecha.realizarLasReparaciones unosTecnicos $ unAuto
+ordenDeReparacion unaFecha unosTecnicos = actualizarUltimaFechaDeReparacion unaFecha.realizarLasReparaciones unosTecnicos 
 
 actualizarUltimaFechaDeReparacion :: Fecha -> Auto -> Auto
 actualizarUltimaFechaDeReparacion fechaDelUltimoArreglo unAuto = unAuto {ultimoArreglo = fechaDelUltimoArreglo}
 
 realizarLasReparaciones :: [Tecnico] -> TallerMecanico
-realizarLasReparaciones unosTecnicos unAuto = foldl1 (.) unosTecnicos $ unAuto 
+realizarLasReparaciones unosTecnicos  = foldl1 (.) unosTecnicos  
 
 -- 6)
 
@@ -199,16 +215,21 @@ autosQueNecesitanRevision unosAutos = filter necesitaRevision unosAutos
 
 -- Si, se puede hacer con una lista infinita ya que la funcion head trabaja con la estrategia de "evaluacion perezosa"
 -- o call-by-name, entonces va a evaluar solamente los parametros que necesita (solo el primer elemento)
--- y "trabajar" a partir de eso.
+-- y "trabajar" a partir de eso. 
 
 -- Ej.
 
 primerTecnicoQueDejaElAutoEnCondiciones :: [Tecnico] -> Auto -> Tecnico
 primerTecnicoQueDejaElAutoEnCondiciones unosTecnicos unAuto = head (tecnicosQueDejanElAutoEnCondiciones unosTecnicos unAuto)
 
+-- El unico problema que podria presentarse es que no haya tecnicos que dejen el auto en condiciones, entonces nunca termina de evaluar.
+
 --Integrante b
+
+-- agregar la segunda respuesta
 
 -- No se puede hacer con una lista infinita porque filter trabaja con la estrategia call-by-value o 
 -- "evaluacion ansiosa" y los parametros tienen que resolverse antes de aplicar la funcion. En este
--- caso, como se trata de una lista infinita, es imposible obtener lo que buscamos.
+-- caso, como se trata de una lista infinita, es imposible obtener lo que buscamos. 
+
 
