@@ -74,22 +74,7 @@ esPatenteVieja :: Patente -> Bool
 esPatenteVieja = not.patenteTieneSieteDigitos
 
 patenteEstaEntreDJyNB :: Patente -> Bool
-patenteEstaEntreDJyNB unaPatente = estaEntreDyN unaPatente && estaEntreJyB unaPatente
-
-estaEntreDyN :: Patente -> Bool
-estaEntreDyN = entreDyN.head 
-
-estaEntreJyB :: Patente -> Bool
-estaEntreJyB = entreJyB.segundoDeLaLista
-
--- cambiar
-
-entreDyN :: Char -> Bool
-entreDyN unaLetra = elem unaLetra ['D'..'N']
-
-entreJyB :: Char -> Bool
-entreJyB unaLetra = elem unaLetra (['A','B'] ++ ['J'..'Z']) 
-
+patenteEstaEntreDJyNB unaPatente = "DJ" < (take 2 unaPatente) && (take 2 unaPatente) < "NB"
 
 -- 2)
 
@@ -168,7 +153,7 @@ autosUbicadosEnPosicionParTienenDesgastePar = all even.map desgasteDelAuto.eleme
 elementosImpares :: [a] -> [a]
 elementosImpares [] = []
 elementosImpares [elemento] = [elemento]
-elementosImpares [_,segundo] = [segundo]
+elementosImpares [primero,_] = [primero]
 elementosImpares (primero:_:cola) = (primero:elementosImpares(cola))
 
 elementosPares :: [a] -> [a]
@@ -204,7 +189,7 @@ arreglarAuto unAuto unTecnico = not.esUnAutoPeligroso.unTecnico $ unAuto
 -- Integrante b
 
 costoDeReparacionDeAutosQueNecesitanRevision :: [Auto] -> [Int]
-costoDeReparacionDeAutosQueNecesitanRevision unosAutos = map costoDeReparacion.autosQueNecesitanRevision $ unosAutos
+costoDeReparacionDeAutosQueNecesitanRevision unosAutos = sum (map costoDeReparacion.autosQueNecesitanRevision $ unosAutos)
 
 autosQueNecesitanRevision :: [Auto] -> [Auto]
 autosQueNecesitanRevision unosAutos = filter necesitaRevision unosAutos 
@@ -231,5 +216,12 @@ primerTecnicoQueDejaElAutoEnCondiciones unosTecnicos unAuto = head (tecnicosQueD
 -- No se puede hacer con una lista infinita porque filter trabaja con la estrategia call-by-value o 
 -- "evaluacion ansiosa" y los parametros tienen que resolverse antes de aplicar la funcion. En este
 -- caso, como se trata de una lista infinita, es imposible obtener lo que buscamos. 
+
+-- En caso de desear obtener solo los primeros 3 autos que necesitan revision, podriamos hacerlo de la siguiente forma:
+
+primeros3AutosQueNecesitanRevision unosAutos = take 3 (filter necesitaRevision unosAutos)
+
+-- Siempre y cuando haya 3 autos que necesiten revision ya que si hay menos la funcion seguira procesando la informacion
+-- con el objetivo de encontrar los 3 autos
 
 
